@@ -12,13 +12,28 @@ func crear_slime():
 		return
 
 	var slime = slime_scene.instantiate()
+	slime.global_position = Vector2(100,  0)
 
-	slime.global_position = Vector2(150, 30)
-
-	# 🔹 Intentar asignar color sin romper el juego
-	if "color_personaje" in slime:
-		slime.color_personaje = Color(randf(), randf(), randf())
-	else:
-		print("Aviso: slime sin variable color_personaje")
-
+	var color_random = Color(randf(), randf(), randf())
+	
+	aplicar_color_shader(slime, color_random)
+	
+	_cambiar_color_recursivo(slime, color_random)
 	add_child(slime)
+	
+func _cambiar_color_recursivo(nodo, color):
+	if nodo is CanvasItem:
+		nodo.modulate = color
+	
+	for hijo in nodo.get_children():
+		_cambiar_color_recursivo(hijo, color)
+	# 🔹 Intentar asignar color sin romper el juego
+func aplicar_color_shader(nodo, color):
+	if nodo is CanvasItem:
+		var mat = ShaderMaterial.new()
+		mat.shader = preload("res://slime_tint.gdshader")
+		mat.set_shader_parameter("tint_color", color)
+		nodo.material = mat
+
+	for hijo in nodo.get_children():
+		aplicar_color_shader(hijo, color)

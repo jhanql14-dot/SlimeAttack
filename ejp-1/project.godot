@@ -15,6 +15,15 @@ run/main_scene="uid://b1tcgly5dovjc"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+Global="*res://Global.gd"
+
+[layer_names]
+
+2d_physics/layer_1="Suelo"
+2d_physics/layer_2="Slimes"
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0
