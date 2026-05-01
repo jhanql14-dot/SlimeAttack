@@ -1,8 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://b1tcgly5dovjc"]
+[gd_scene format=3 uid="uid://b1tcgly5dovjc"]
 
+[ext_resource type="Texture2D" uid="uid://brrf4lrd1exxs" path="res://images/main/plataforma.png" id="1_fos0i"]
 [ext_resource type="Script" uid="uid://40okfybym745" path="res://spawner.gd" id="1_glv2v"]
 [ext_resource type="PackedScene" uid="uid://cagnmugkb6ts3" path="res://Slime.tscn" id="2_uu6xs"]
 [ext_resource type="Script" uid="uid://djsur8rs8o1e5" path="res://Global.gd" id="3_r0du0"]
+[ext_resource type="Texture2D" uid="uid://dovmluinqgo1w" path="res://images/main/font.png" id="4_cm0pq"]
+[ext_resource type="Texture2D" uid="uid://ce0oc0b00x3gr" path="res://images/main/earth.jpg" id="5_3dxm6"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_uu6xs"]
 
@@ -17,117 +20,206 @@ size = Vector2(137, 24)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_fos0i"]
 size = Vector2(23, 529)
 
-[node name="Node2D" type="Node2D"]
+[sub_resource type="AtlasTexture" id="AtlasTexture_fos0i"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(0, 0, 560, 272)
 
-[node name="StaticBody2D" type="StaticBody2D" parent="."]
+[sub_resource type="AtlasTexture" id="AtlasTexture_3dxm6"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(560, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lgr22"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(1120, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_trn2v"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(1680, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_03owx"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(2240, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_wkp8b"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(2800, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_20pc6"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(3360, 0, 560, 272)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5vvyt"]
+atlas = ExtResource("4_cm0pq")
+region = Rect2(3920, 0, 560, 272)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_c6i3y"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fos0i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3dxm6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lgr22")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_trn2v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_03owx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_wkp8b")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_20pc6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5vvyt")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[node name="Node2D" type="Node2D" unique_id=422834103]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=444815365]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D"]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D" unique_id=1907286990]
 position = Vector2(1.9999886, 62)
+rotation = 3.1415927
 scale = Vector2(562, 26)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=666114278]
 position = Vector2(1.5, 62)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+[node name="StaticBody2D2" type="StaticBody2D" parent="." unique_id=1941947941]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D2"]
-position = Vector2(-423, 0)
-scale = Vector2(136.25002, 26)
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D2" unique_id=1954936739]
+position = Vector2(-425.00003, -5)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2" unique_id=2122226257]
 position = Vector2(-425, -4)
 shape = SubResource("RectangleShape2D_cm0pq")
 
-[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+[node name="StaticBody2D3" type="StaticBody2D" parent="." unique_id=891658260]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D3"]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D3" unique_id=1761981834]
 position = Vector2(386, 2)
+rotation = 3.1415927
 scale = Vector2(136.25002, 26)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3" unique_id=144786541]
 position = Vector2(385, 3)
 shape = SubResource("RectangleShape2D_cm0pq")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=346593700]
 
-[node name="Spawner" type="Node2D" parent="."]
+[node name="Spawner" type="Node2D" parent="." unique_id=1193400139]
 script = ExtResource("1_glv2v")
 slime_scene = ExtResource("2_uu6xs")
 
-[node name="GameManager" type="Node" parent="."]
+[node name="GameManager" type="Node" parent="." unique_id=2089170012]
 script = ExtResource("3_r0du0")
 
-[node name="StaticBody2D4" type="StaticBody2D" parent="."]
+[node name="StaticBody2D4" type="StaticBody2D" parent="." unique_id=1824078104]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D4"]
-position = Vector2(-566.125, 55.625015)
-scale = Vector2(21.75009, 528.75)
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D4" unique_id=918168867]
+position = Vector2(-575, 53)
+scale = Vector2(39.39009, 528.75)
 mesh = SubResource("QuadMesh_r0du0")
+texture = ExtResource("5_3dxm6")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4" unique_id=364989859]
 position = Vector2(-566, 57)
 shape = SubResource("RectangleShape2D_fos0i")
 
-[node name="StaticBody2D5" type="StaticBody2D" parent="."]
+[node name="StaticBody2D5" type="StaticBody2D" parent="." unique_id=1540511664]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D5"]
-position = Vector2(563.0001, 61.0625)
-scale = Vector2(21.75009, 529.875)
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D5" unique_id=1141914763]
+position = Vector2(574.00006, 52)
+scale = Vector2(43.43009, 546.755)
 mesh = SubResource("QuadMesh_r0du0")
+texture = ExtResource("5_3dxm6")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5" unique_id=2050341488]
 position = Vector2(563, 60.5)
 shape = SubResource("RectangleShape2D_fos0i")
 
-[node name="StaticBody2D6" type="StaticBody2D" parent="."]
+[node name="StaticBody2D6" type="StaticBody2D" parent="." unique_id=1902253042]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D6"]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D6" unique_id=1148434049]
 position = Vector2(-5, -88)
+rotation = 3.1415927
 scale = Vector2(562, 26)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D6"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D6" unique_id=135350827]
 position = Vector2(-8, -88)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D7" type="StaticBody2D" parent="."]
+[node name="StaticBody2D7" type="StaticBody2D" parent="." unique_id=840721506]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D7"]
-position = Vector2(-294.75, 311)
-scale = Vector2(559.5, 26)
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D7" unique_id=386271177]
+texture_repeat = 1
+position = Vector2(-291.00003, 309)
+rotation = 3.1415927
+scale = Vector2(700, 26)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7" unique_id=1390908207]
 position = Vector2(-295.125, 309)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D8" type="StaticBody2D" parent="."]
+[node name="StaticBody2D8" type="StaticBody2D" parent="." unique_id=1048821346]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D8"]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D8" unique_id=2049799778]
+texture_filter = 1
+texture_repeat = 2
 position = Vector2(269.75, 309)
-scale = Vector2(561.50006, 26)
+rotation = 3.1415927
+scale = Vector2(700, 26)
 mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D8"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D8" unique_id=1326735053]
 position = Vector2(269.0625, 308)
 shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=128718372]
+z_index = -10
+position = Vector2(-20, 19)
+scale = Vector2(2.3, 2.3)
+sprite_frames = SubResource("SpriteFrames_c6i3y")
+autoplay = "default"
+frame_progress = 0.50548846
