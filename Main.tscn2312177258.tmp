@@ -1,0 +1,52 @@
+[gd_scene load_steps=5 format=3 uid="uid://b1tcgly5dovjc"]
+
+[ext_resource type="Script" uid="uid://40okfybym745" path="res://spawner.gd" id="1_glv2v"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_uu6xs"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r0du0"]
+size = Vector2(523, 26)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cm0pq"]
+size = Vector2(137, 24)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="StaticBody2D" type="StaticBody2D" parent="."]
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D"]
+position = Vector2(0.5, 62)
+scale = Vector2(523, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D"]
+position = Vector2(1.5, 62)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="StaticBody2D2" type="StaticBody2D" parent="."]
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D2"]
+position = Vector2(-218.875, 39)
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2"]
+position = Vector2(-217.5, 39)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="StaticBody2D3" type="StaticBody2D" parent="."]
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D3"]
+position = Vector2(325, 37)
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3"]
+position = Vector2(327, 38)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+
+[node name="Spawner" type="Node2D" parent="."]
+script = ExtResource("1_glv2v")

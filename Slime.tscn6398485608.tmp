@@ -307,7 +307,7 @@ _data = {
 [node name="Node2D" type="Node2D"]
 
 [node name="CharacterBody2D" type="CharacterBody2D" parent="."]
-collision_mask = 2
+collision_layer = 0
 script = ExtResource("1_jt5hk")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="CharacterBody2D"]
@@ -323,7 +323,3 @@ root_node = NodePath("../Sprite2D")
 libraries = {
 &"": SubResource("AnimationLibrary_fpc3o")
 }
-
-[node name="Label" type="Label" parent="CharacterBody2D"]
-offset_right = 40.0
-offset_bottom = 23.0
