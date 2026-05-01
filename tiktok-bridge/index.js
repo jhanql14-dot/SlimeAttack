@@ -44,20 +44,13 @@ tiktokLiveConnection.on('like', (data) => {
     }
 });
 
-// --- ESCUCHAR CUANDO ALGUIEN SE UNE ---
+// --- ESCUCHAR CUANDO ALGUIEN SE UNE AL LIVE ---
 tiktokLiveConnection.on('member', (data) => {
     console.log(`👋 Se unió: ${data.uniqueId}`);
     if (gameSocket) {
-        // Aviso normal de que alguien se unió
+        // Enviar evento 'join' → Godot hará caer un slime
         gameSocket.send(JSON.stringify({
-            type: 'unir',
-            usuario: data.uniqueId
-        }));
-        // ¡Magia! Simulamos una donación para que caiga el objeto en el juego
-        gameSocket.send(JSON.stringify({
-            type: 'donacion',
-            nombre: 'Rosa',
-            cantidad: 1,
+            type: 'join',
             usuario: data.uniqueId
         }));
     }
