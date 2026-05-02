@@ -10,6 +10,10 @@
 [ext_resource type="Texture2D" uid="uid://ce0oc0b00x3gr" path="res://images/main/earth.jpg" id="5_3dxm6"]
 [ext_resource type="Texture2D" uid="uid://cm11txo0rhfol" path="res://images/main/plataforma5.png" id="5_c6i3y"]
 [ext_resource type="Texture2D" uid="uid://fdhr1kei6pcu" path="res://images/main/fondo.jpg" id="6_3dxm6"]
+[ext_resource type="Texture2D" uid="uid://cbmdpvrsdpkis" path="res://images/main/mar.jpeg" id="10_c2ibq"]
+[ext_resource type="Texture2D" uid="uid://ei7wykb3fowf" path="res://images/main/fondodesierto.jpg" id="11_c2ibq"]
+[ext_resource type="Texture2D" uid="uid://dxrx3bipvug4e" path="res://images/main/pantano.jpg" id="12_c2ibq"]
+[ext_resource type="Texture2D" uid="uid://xa1esy5x8kg5" path="res://images/main/metal.jpg" id="13_j4qnp"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_uu6xs"]
 
@@ -84,7 +88,39 @@ animations = [{
 "texture": SubResource("AtlasTexture_5vvyt")
 }],
 "loop": true,
-"name": &"default",
+"name": &"escenario1",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_c2ibq")
+}],
+"loop": true,
+"name": &"escenario2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_c2ibq")
+}],
+"loop": true,
+"name": &"escenario3",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_c2ibq")
+}],
+"loop": true,
+"name": &"escenario4",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_j4qnp")
+}],
+"loop": true,
+"name": &"escenario5",
 "speed": 5.0
 }]
 
@@ -562,42 +598,16 @@ position = Vector2(269.0625, 308)
 shape = SubResource("RectangleShape2D_r0du0")
 
 [node name="AnimatedSprite2D1" type="AnimatedSprite2D" parent="." unique_id=128718372]
-visible = false
 z_index = -10
 position = Vector2(-20, -74.49998)
-scale = Vector2(2.3, 3.0845592)
+scale = Vector2(2.8999991, 3.204559)
 sprite_frames = SubResource("SpriteFrames_c6i3y")
-autoplay = "default"
-
-[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=150360236]
-z_index = -10
-position = Vector2(-20, -74.49998)
-scale = Vector2(2.3, 3.0845592)
-sprite_frames = SubResource("SpriteFrames_c6i3y")
-autoplay = "default"
-
-[node name="AnimatedSprite2D3" type="AnimatedSprite2D" parent="." unique_id=1883577929]
-z_index = -10
-position = Vector2(-20, -74.49998)
-scale = Vector2(2.3, 3.0845592)
-sprite_frames = SubResource("SpriteFrames_c6i3y")
-autoplay = "default"
-
-[node name="AnimatedSprite2D4" type="AnimatedSprite2D" parent="." unique_id=502377430]
-z_index = -10
-position = Vector2(-20, -74.49998)
-scale = Vector2(2.3, 3.0845592)
-sprite_frames = SubResource("SpriteFrames_c6i3y")
-autoplay = "default"
-
-[node name="AnimatedSprite2D5" type="AnimatedSprite2D" parent="." unique_id=1834159158]
-z_index = -10
-position = Vector2(-20, -74.49998)
-scale = Vector2(2.3, 3.0845592)
-sprite_frames = SubResource("SpriteFrames_c6i3y")
-autoplay = "default"
+animation = &"escenario1"
+autoplay = "escenario1"
+frame_progress = 0.77669907
 
 [node name="Fondo" type="Sprite2D" parent="." unique_id=627562537]
-position = Vector2(0.4999771, 477.125)
+position = Vector2(-2, 458.99997)
 scale = Vector2(0.8642171, 0.58368856)
 texture = ExtResource("6_3dxm6")
+metadata/_edit_lock_ = true

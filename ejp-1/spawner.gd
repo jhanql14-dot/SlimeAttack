@@ -5,14 +5,18 @@ var max_slimes := 50
 var spawn_enabled := false
 var queued_users := []
 var active_users := {} # { "nombre": timestamp } para saber quién sigue en el live
+var _empty_timer := 0.0
+var _single_timer := 0.0
 
 @export var spawn_position := Vector2(100, -450)
 @export var colores_posibles: Array[Color] = [
-	Color(0.2, 0.8, 0.2), # Verde
-	Color(0.2, 0.2, 0.8), # Azul
-	Color(0.8, 0.2, 0.2), # Rojo
-	Color(0.8, 0.8, 0.2), # Amarillo
-	Color(0.8, 0.2, 0.8)  # Morado
+	Color(0.0, 1.0, 0.2), # Verde Neón
+	Color(0.0, 0.5, 1.0), # Azul Eléctrico
+	Color(1.0, 0.1, 0.1), # Rojo Intenso
+	Color(1.0, 0.9, 0.0), # Amarillo Oro
+	Color(1.0, 0.0, 1.0), # Magenta
+	Color(0.0, 1.0, 1.0), # Cian
+	Color(1.0, 0.5, 0.0)  # Naranja
 ]
 
 var _ws := WebSocketPeer.new()
@@ -28,6 +32,7 @@ func _ready():
 		_spawn_queued_slimes()
 
 func _process(_delta):
+	_handle_auto_bots(_delta)
 	_ws.poll()
 	var state = _ws.get_ready_state()
 	if state == WebSocketPeer.STATE_OPEN:
@@ -60,6 +65,29 @@ func _conectar_websocket():
 		print("⚠️ No se pudo conectar al WebSocket: ", err)
 	else:
 		print("🔌 Intentando conectar al bridge de TikTok...")
+
+func _handle_auto_bots(delta):
+	var slimes = get_tree().get_nodes_in_group("slimes")
+	var count = slimes.size()
+	
+	if count == 0:
+		_empty_timer += delta
+		if _empty_timer >= 10.0:
+			print("🤖 Live vacío por 10s. Spawneando 2 bots...")
+			crear_slime("")
+			crear_slime("")
+			_empty_timer = 0.0
+	else:
+		_empty_timer = 0.0
+		
+	if count == 1:
+		_single_timer += delta
+		if _single_timer >= 10.0:
+			print("🤖 Solo 1 jugador por 10s. Spawneando 1 bot para pelear...")
+			crear_slime("")
+			_single_timer = 0.0
+	else:
+		_single_timer = 0.0
 
 func _input(event):
 	if event.is_action_pressed("ui_accept"):
@@ -137,7 +165,7 @@ func crear_slime(usuario = ""):
 	slime.global_position = spawn_position
 	
 	var slime_body = slime.get_node("CharacterBody2D")
-	var nombre_asignar = usuario if usuario != "" else "Jugador" + str(randi() % 1000)
+	var nombre_asignar = usuario if usuario != "" else "Bot" + str(randi() % 1000)
 	slime_body.nombre = nombre_asignar
 
 	# RESTAURAR PERSISTENCIA
@@ -192,3 +220,37 @@ func aplicar_color_shader(nodo, color):
 
 	for hijo in nodo.get_children():
 		aplicar_color_shader(hijo, color)
+
+func spawn_black_slime():
+	if slime_scene == null: return
+	
+	var slime = slime_scene.instantiate()
+	slime.global_position = spawn_position
+	
+	var body = slime.get_node("CharacterBody2D")
+	body.nombre = "DARK"
+	body.is_black_slime = true # Debemos añadir esta variable en SlimeMovement.gd
+	
+	# Stats de Jefe
+	body.max_health = 600 # Doble de vida (normal es 300)
+	body.health = 600
+	body.speed = int(body.speed * 1.5)
+	body.tiempo_espera *= 0.7 # Ataca 1.5x más rápido (menos espera)
+	
+	# Color Negro y Sombrío
+	aplicar_color_shader(slime, Color.BLACK)
+	_cambiar_color_recursivo(slime, Color.BLACK)
+	
+	# Doble de Tamaño
+	var sprite = body.get_node("Sprite2D")
+	if sprite:
+		sprite.scale = Vector2(2.0, 2.0)
+	
+	add_child(slime)
+	
+	# Sonido de aparición especial
+	var snd = AudioStreamPlayer.new()
+	snd.stream = preload("res://sounds/76_EnemyRespawnSound.mp3")
+	add_child(snd)
+	snd.play()
+	snd.finished.connect(snd.queue_free)

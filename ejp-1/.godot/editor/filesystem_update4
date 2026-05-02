@@ -1,4 +1,3 @@
-res://Main.tscn
-res://SlimeMovement.gd
-res://Global.gd
+res://slime_tint.gdshader
 res://spawner.gd
+res://Main.tscn

@@ -23,7 +23,11 @@ var lbl_announcement : Label
 var total_taps := 0
 var rain_active := false
 var first_blood_happened := false
-var target_taps := 100
+var target_taps := 1000
+var effect_running := false
+var last_thousand_triggered := 0
+var last_hit_msec := 0
+var black_slime_spawned := false
 
 # Parámetros para anuncios de Kill (puedes cambiarlos aquí)
 var announcement_y_pos := 250.0 # Posición vertical (más alto o más bajo)
@@ -40,7 +44,8 @@ func _ready():
 	bgm.volume_db = -21.0 # Reducir volumen
 	add_child(bgm)
 	bgm.play()
-	
+	update_environment()
+	restore_platforms()
 	run_game_loop()
 
 func _crear_interfaz():
@@ -153,32 +158,42 @@ func _actualizar_interfaz():
 	elif total_taps < 500: target_taps = 500
 	else: target_taps = 1000
 	
-	lbl_taps.text = "💖 " + str(total_taps) + "/" + str(target_taps)
+	# Nuevos hitos de taps (Cada 1000 taps)
+	var current_thousands = int(total_taps / 1000)
+	if not effect_running and current_thousands > last_thousand_triggered:
+		last_thousand_triggered = current_thousands
+		trigger_tap_burst("stars")
+
+	lbl_taps.text = "💖 " + str(total_taps) + "/" + str(current_thousands * 1000 + 1000)
+
+func trigger_tap_burst(type: String):
+	effect_running = true
+	var burst_time := 3.0
+	var timer := 0.0
+	while timer < burst_time:
+		_spawn_weather_particles(type)
+		await get_tree().create_timer(0.5).timeout
+		timer += 0.5
 	
-	# Nuevos hitos de taps
-	if total_taps >= 1000:
-		_spawn_weather_particles("hearts")
-	elif total_taps >= 100:
-		_spawn_weather_particles("stars")
+	# Esperar un poco más para permitir que los taps sigan subiendo sin repetir el efecto inmediatamente
+	await get_tree().create_timer(5.0).timeout 
+	effect_running = false
 
 func add_taps(cantidad: int):
 	total_taps += cantidad
 	_actualizar_interfaz()
 
 func update_environment():
-	# 1. Actualizar Fondos Animados (AnimatedSprite2D1-5)
-	for i in range(1, 6):
-		var node_name = "AnimatedSprite2D" + str(i)
-		var node = get_tree().current_scene.get_node_or_null(node_name)
-		if is_instance_valid(node):
-			if i == current_round:
-				node.visible = true
-				if node.has_method("play"): node.play("default")
-			else:
-				node.visible = false
-				if node.has_method("stop"): node.stop()
-	
-	print("🖼️ Fondo actualizado para la Ronda ", current_round)
+	# 1. Actualizar Escenarios en AnimatedSprite2D1
+	var anim_fondo = get_tree().current_scene.get_node_or_null("AnimatedSprite2D1")
+	if is_instance_valid(anim_fondo):
+		var anim_name = "escenario" + str(current_round)
+		if anim_fondo.sprite_frames.has_animation(anim_name):
+			anim_fondo.play(anim_name)
+			print("🖼️ Escenario cambiado a: ", anim_name)
+		else:
+			# Fallback por si no están todas
+			anim_fondo.play("default")
 	
 	# 2. Efectos de Nivel (Clima base)
 	_apply_environment_periodic_effect()
@@ -290,20 +305,25 @@ func run_game_loop():
 		emit_signal("toggle_spawn", true)
 		lbl_winner.visible = false 
 		first_blood_happened = false
+		black_slime_spawned = false
 		_actualizar_interfaz()
-		update_environment() # Cambiar fondo y clima del nivel
-		restore_platforms() 
 		
 		var elapsed := 0
-		while time_left > 0:
-			_actualizar_interfaz()
-			emit_signal("update_time", time_left)
-			await get_tree().create_timer(1).timeout
-			time_left -= 1
-			elapsed += 1
+		while true:
 			var slimes = get_tree().get_nodes_in_group("slimes")
-			if slimes.size() >= 50 and elapsed >= 10:
-				break
+			if slimes.size() > 1:
+				_actualizar_interfaz()
+				emit_signal("update_time", time_left)
+				await get_tree().create_timer(1).timeout
+				time_left -= 1
+				elapsed += 1
+				if time_left <= 0:
+					break
+			else:
+				# Solo hay 1 jugador o ninguno, esperamos
+				lbl_timer.text = "ESPERANDO JUGADORES...\n(" + str(slimes.size()) + "/2)"
+				await get_tree().create_timer(1).timeout
+			
 			if game_phase != 1:
 				break
 
@@ -342,6 +362,9 @@ func run_game_loop():
 		emit_signal("update_phase", game_phase)
 		emit_signal("toggle_spawn", false)
 
+		# Registrar tiempo inicial para detectar inactividad
+		last_hit_msec = Time.get_ticks_msec()
+		
 		var p2_elapsed := 0
 		while time_left > 0:
 			_actualizar_interfaz()
@@ -350,7 +373,12 @@ func run_game_loop():
 			time_left -= 1
 			p2_elapsed += 1
 			
-			if p2_elapsed == 10:
+			if current_round == 5 and p2_elapsed == 10 and not black_slime_spawned:
+				_trigger_black_slime_event()
+				
+			# Detectar si no ha habido golpes en los últimos 10 segundos
+			var time_since_hit = (Time.get_ticks_msec() - last_hit_msec) / 1000.0
+			if time_since_hit >= 10.0:
 				collapse_platforms()
 
 			var slimes = get_tree().get_nodes_in_group("slimes")
@@ -383,6 +411,8 @@ func run_game_loop():
 			print("🔄 Ciclo de 5 rondas completado. Reiniciando...")
 
 		lbl_timer.text = "REINICIANDO..."
+		# Cambio simultáneo e instantáneo de Escenario y Plataformas
+		update_environment()
 		restore_platforms()
 		clear_all()
 		await get_tree().create_timer(2).timeout
@@ -410,6 +440,27 @@ func restore_platforms():
 				body.process_mode = PROCESS_MODE_DISABLED
 				body.visible = false
 
+
+func _trigger_black_slime_event():
+	black_slime_spawned = true
+	var spawner = get_tree().current_scene.get_node_or_null("Spawner")
+	if is_instance_valid(spawner) and spawner.has_method("spawn_black_slime"):
+		spawner.spawn_black_slime()
+	
+	# Sonido de Alerta (Bucle por 10 segundos)
+	var alert = AudioStreamPlayer.new()
+	alert.stream = preload("res://sounds/105_AlertSound.mp3")
+	hud.add_child(alert)
+	alert.play()
+	
+	# Simular bucle por 10 segundos (si el sonido es corto)
+	var start_t = Time.get_ticks_msec()
+	while Time.get_ticks_msec() - start_t < 10000:
+		if not alert.playing: alert.play()
+		await get_tree().create_timer(0.1).timeout
+	
+	alert.stop()
+	alert.queue_free()
 
 func _play_sfx(path):
 	var sfx = AudioStreamPlayer.new()

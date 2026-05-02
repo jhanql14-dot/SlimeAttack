@@ -27,6 +27,16 @@ var gravedad := 1600.0
 @export var jump_sound_delay := 0.0   # Retraso del sonido tras el salto
 @export var attack_sound_volume := -6.0 # Volumen del ataque
 @export var attack_sound_delay := 0.0   # Retraso del sonido del ataque
+@export_group("Configuración de Aura (Rachas)")
+@export var glow_color := Color(1, 0.9, 0.2) # Color base del aura
+@export var aura_energy_double := 0.8
+@export var aura_scale_double := 0.5
+@export var aura_energy_triple := 1.2
+@export var aura_scale_triple := 0.7
+@export var aura_energy_ultra := 1.6
+@export var aura_scale_ultra := 0.9
+@export var aura_energy_rampage := 2.0
+@export var aura_scale_rampage := 1.1
 
 var direccion := 1
 var target = null
@@ -57,8 +67,12 @@ var historial_saltos = []  # Rastrear corto(0) o largo(1)
 var consecutive_victories := 0
 var total_wins := 0
 var is_champion := false
+var is_black_slime := false
 var current_round_kills := 0
-var last_kill_msec := 0
+var last_kill_msec = 0
+var glow_node : PointLight2D
+var name_v_offset := 0.0
+var has_black_aura := false
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var anim: AnimationPlayer = $AnimationPlayer
@@ -96,6 +110,7 @@ func _ready():
 		lbl_nombre = label
 		_actualizar_nombre_ui()
 	
+	_preparar_glow()
 	loop_saltos()
 
 func _actualizar_nombre_ui():
@@ -107,7 +122,7 @@ func _actualizar_nombre_ui():
 		var collision = get_node_or_null("CollisionShape2D")
 		if collision and collision.shape is RectangleShape2D:
 			var extents = collision.shape.extents
-			lbl_nombre.position = collision.position + Vector2(-50, -extents.y - 30)
+			lbl_nombre.position = collision.position + Vector2(-50, -extents.y - 30 - name_v_offset)
 			lbl_nombre.size = Vector2(100, 30)
 
 
@@ -150,6 +165,7 @@ func _physics_process(delta):
 			else:
 				anim.play("Slime_Die")
 
+		_handle_wall_bounce()
 		move_and_slide()
 		return
 
@@ -183,8 +199,22 @@ func _physics_process(delta):
 		if can_attack and not is_attacking and not is_hurt:
 			try_attack(target)
 
+	_prevent_name_overlap()
+	_handle_wall_bounce()
 	move_and_slide()
 	actualizar_animacion()
+
+func _handle_wall_bounce():
+	if is_on_wall():
+		var collision = get_last_slide_collision()
+		if collision:
+			var collider = collision.get_collider()
+			if collider and (collider.name == "pared1" or collider.name == "pared2"):
+				# Rebotar hacia el centro (x=0)
+				direccion = 1 if global_position.x < 0 else -1
+				velocity.x = direccion * speed * 1.5
+				if is_instance_valid(sprite):
+					sprite.flip_h = direccion > 0
 
 
 # 👀 detectar enemigo
@@ -266,8 +296,9 @@ func attack(enemy):
 		var damage = randi_range(attack_damage_min, attack_damage_max)
 		enemy.take_damage(damage)
 		if enemy.dead:
-			_on_enemy_killed()
+			_on_enemy_killed(enemy)
 			apply_victory_boost()
+			_actualizar_glow()
 
 	await get_tree().create_timer(1.0).timeout
 
@@ -290,6 +321,7 @@ func take_damage(amount):
 
 	health -= amount
 	phase_damage += amount
+	Global.last_hit_msec = Time.get_ticks_msec()
 
 	if phase_damage >= phase_threshold:
 		phase_damage -= phase_threshold
@@ -329,8 +361,11 @@ func die():
 
 	# 🔊 Sonido de muerte
 	var death_sound = AudioStreamPlayer.new()
-	death_sound.stream = preload("res://sounds/14_PlayerHitAndLosePowerUp.mp3")
-	get_parent().add_child(death_sound) # Añadir al padre para que no muera con el slime
+	if is_black_slime:
+		death_sound.stream = preload("res://sounds/82_EnemyDie.mp3")
+	else:
+		death_sound.stream = preload("res://sounds/14_PlayerHitAndLosePowerUp.mp3")
+	get_parent().add_child(death_sound)
 	death_sound.play()
 	death_sound.finished.connect(death_sound.queue_free)
 
@@ -489,11 +524,16 @@ func lanzar_confeti():
 	particles.queue_free()
 	win_sound.queue_free()
 
-func _on_enemy_killed():
+func _on_enemy_killed(killed_enemy):
 	var now = Time.get_ticks_msec()
 	var time_since_last = (now - last_kill_msec) / 1000.0
 	
 	current_round_kills += 1
+	
+	# RECOMPENSA DARK: Si mató al Slime Negro, obtiene Aura Negra
+	if killed_enemy and killed_enemy.is_black_slime:
+		has_black_aura = true
+		print("🌑 ¡", nombre, " HA OBTENIDO EL AURA NEGRA!")
 	
 	# FIRST BLOOD
 	if not Global.first_blood_happened:
@@ -530,3 +570,86 @@ func _on_enemy_killed():
 			5, _: Global.announce_kill("rampage", nombre, sprite.modulate)
 
 	last_kill_msec = now
+
+func _on_round_start():
+	current_round_kills = 0
+	has_black_aura = false # Perder aura negra al terminar ronda
+	_actualizar_glow()
+
+func _preparar_glow():
+	glow_node = PointLight2D.new()
+	glow_node.enabled = false
+	glow_node.color = Color(1, 0.9, 0.2) # Amarillo brillante
+	glow_node.energy = 0.0
+	glow_node.blend_mode = PointLight2D.BLEND_MODE_ADD
+	
+	# Crear textura radial circular suave por código
+	var gradient = Gradient.new()
+	gradient.offsets = [0.0, 0.7, 1.0]
+	gradient.colors = [Color.WHITE, Color(1, 1, 1, 0.3), Color(1, 1, 1, 0)]
+	
+	var tex = GradientTexture2D.new()
+	tex.gradient = gradient
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(0.8, 0.5) # Asegura que se desvanezca antes del borde
+	tex.width = 256 # Más resolución para suavidad
+	tex.height = 256
+	glow_node.texture = tex
+	
+	add_child(glow_node)
+
+func _actualizar_glow():
+	if not is_instance_valid(glow_node): return
+	
+	# El Aura Negra es permanente durante la ronda si se obtiene
+	if current_round_kills < 2 and not has_black_aura:
+		glow_node.enabled = false
+		return
+	
+	glow_node.enabled = true
+	glow_node.color = Color.BLACK if has_black_aura else glow_color
+	var intensity = 0.0
+	var g_scale = 1.0
+	
+	# Si tiene aura negra, forzar valores mínimos llamativos
+	if has_black_aura:
+		intensity = 3.0
+		g_scale = 2.0
+
+	# Pero si además tiene racha, usar el mayor de los dos
+	match current_round_kills:
+		2: # Double
+			intensity = aura_energy_double
+			g_scale = aura_scale_double
+		3: # Triple
+			intensity = aura_energy_triple
+			g_scale = aura_scale_triple
+		4: # Ultra
+			intensity = aura_energy_ultra
+			g_scale = aura_scale_ultra
+		_: # Rampage o más
+			intensity = aura_energy_rampage
+			g_scale = aura_scale_rampage
+			
+	var tween = get_tree().create_tween()
+	tween.tween_property(glow_node, "energy", intensity, 0.5)
+	tween.parallel().tween_property(glow_node, "texture_scale", g_scale, 0.5)
+
+func _prevent_name_overlap():
+	var slimes = get_tree().get_nodes_in_group("slimes")
+	var new_offset = 0.0
+	for s in slimes:
+		if s == self or s.dead: continue
+		var dist_x = abs(global_position.x - s.global_position.x)
+		var dist_y = abs(global_position.y - s.global_position.y)
+		
+		if dist_x < 80 and dist_y < 40:
+			# Si estamos muy cerca, uno de los dos sube su nombre
+			if global_position.x > s.global_position.x:
+				new_offset = 40.0 # Subir el nombre 40px
+				break
+	
+	if new_offset != name_v_offset:
+		name_v_offset = new_offset
+		_actualizar_nombre_ui()
