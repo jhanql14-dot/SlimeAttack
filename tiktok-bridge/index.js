@@ -11,7 +11,7 @@ wss.on('connection', (ws) => {
 });
 
 // Conectar a TikTok (reemplaza con tu usuario cuando estés en vivo)
-let tiktokUsername = "teffyponce_";
+let tiktokUsername = "llkassius";
 let tiktokLiveConnection = new WebcastPushConnection(tiktokUsername);
 
 tiktokLiveConnection.connect().then(state => {
