@@ -4,6 +4,16 @@ extends Node2D
 var max_slimes := 50
 var spawn_enabled := false
 var queued_users := []
+var active_users := {} # { "nombre": timestamp } para saber quién sigue en el live
+
+@export var spawn_position := Vector2(100, -450)
+@export var colores_posibles: Array[Color] = [
+	Color(0.2, 0.8, 0.2), # Verde
+	Color(0.2, 0.2, 0.8), # Azul
+	Color(0.8, 0.2, 0.2), # Rojo
+	Color(0.8, 0.8, 0.2), # Amarillo
+	Color(0.8, 0.2, 0.8)  # Morado
+]
 
 var _ws := WebSocketPeer.new()
 var _ws_url := "ws://localhost:8080"
@@ -30,8 +40,16 @@ func _process(_delta):
 				var data = json.get_data()
 				if data.get("type") == "join":
 					var usuario = data.get("usuario", "?")
+					active_users[usuario] = Time.get_ticks_msec()
 					print("🎮 Nuevo jugador: ", usuario, " → intento de slime")
 					_queue_or_spawn(usuario)
+				elif data.get("type") == "leave":
+					var usuario = data.get("usuario", "?")
+					active_users.erase(usuario)
+					print("🚪 Jugador salió: ", usuario)
+				elif data.get("type") == "taptap":
+					var cantidad = int(data.get("cantidad", 1))
+					Global.add_taps(cantidad)
 	elif state == WebSocketPeer.STATE_CLOSED:
 		# Reintentar conexión cada vez que se cierre
 		_conectar_websocket()
@@ -56,7 +74,8 @@ func _on_toggle_spawn(enabled):
 func _on_update_phase(fase):
 	if fase == 1:
 		spawn_enabled = true
-		print("🟢 Fase 1: reanudando colas")
+		print("🟢 Fase 1: reanudando colas y re-spawneando activos")
+		_respawn_active_players()
 		_spawn_queued_slimes()
 	else:
 		spawn_enabled = false
@@ -75,13 +94,37 @@ func _queue_or_spawn(usuario):
 		queued_users.append(usuario)
 		print("⏳ Cola de espera (", queued_users.size(), "):", queued_users)
 
+func _respawn_active_players():
+	# Intentar re-spawnear a los que ya tienen datos (estuvieron en la ronda anterior)
+	# Solo si siguen activos en el live
+	var slime_count = get_tree().get_nodes_in_group("slimes").size()
+	
+	for usuario in Global.player_data.keys():
+		if slime_count >= max_slimes: break
+		
+		# Solo si el usuario está en active_users (marcado por el bridge)
+		if active_users.has(usuario):
+			crear_slime(usuario)
+			slime_count += 1
+		else:
+			print("⏭️ Saltando respawn de ", usuario, " (no activo)")
+
 func _spawn_queued_slimes():
 	var slime_count = get_tree().get_nodes_in_group("slimes").size()
 	while spawn_enabled and queued_users.size() > 0 and slime_count < max_slimes:
 		var usuario = queued_users.pop_front()
-		print("📤 Sacando de cola y spawneando: ", usuario)
-		crear_slime(usuario)
-		slime_count += 1
+		# Evitar duplicados si ya se re-spawnearon
+		var ya_esta = false
+		for s in get_tree().get_nodes_in_group("slimes"):
+			if s.nombre == usuario:
+				ya_esta = true
+				break
+		
+		if not ya_esta:
+			print("📤 Sacando de cola y spawneando: ", usuario)
+			crear_slime(usuario)
+			slime_count += 1
+	
 	if queued_users.size() > 0 and slime_count >= max_slimes:
 		print("⏳ Quedan en cola: ", queued_users.size())
 
@@ -91,16 +134,46 @@ func crear_slime(usuario = ""):
 		return
 
 	var slime = slime_scene.instantiate()
-	slime.global_position = Vector2(100, 0)
+	slime.global_position = spawn_position
 	
 	var slime_body = slime.get_node("CharacterBody2D")
 	var nombre_asignar = usuario if usuario != "" else "Jugador" + str(randi() % 1000)
 	slime_body.nombre = nombre_asignar
 
-	var color_random = Color(randf(), randf(), randf())
-	aplicar_color_shader(slime, color_random)
-	_cambiar_color_recursivo(slime, color_random)
+	# RESTAURAR PERSISTENCIA
+	if Global.player_data.has(nombre_asignar):
+		var data = Global.player_data[nombre_asignar]
+		# Usar get_node porque @onready sprite aún no está listo
+		var sprite_node = slime_body.get_node("Sprite2D")
+		if sprite_node:
+			sprite_node.scale = Vector2(data.scale, data.scale)
+		
+		slime_body.consecutive_victories = data.wins
+		slime_body.total_wins = data.get("total_wins", 0)
+		slime_body.attack_damage_min = data.damage_min
+		slime_body.attack_damage_max = data.damage_max
+		slime_body.attack_range = data.range
+		
+		aplicar_color_shader(slime, data.color)
+		_cambiar_color_recursivo(slime, data.color)
+		print("♻️ Restaurado stats de ", nombre_asignar, ": Scale ", data.scale)
+	else:
+		var color_final: Color
+		if colores_posibles.size() > 0:
+			color_final = colores_posibles.pick_random()
+		else:
+			color_final = Color(randf(), randf(), randf())
+
+		aplicar_color_shader(slime, color_final)
+		_cambiar_color_recursivo(slime, color_final)
 	add_child(slime)
+	
+	# 🔊 Sonido de aparición
+	var spawn_sound = AudioStreamPlayer.new()
+	spawn_sound.stream = preload("res://sounds/95_CreateBubble.mp3")
+	add_child(spawn_sound)
+	spawn_sound.play()
+	spawn_sound.finished.connect(spawn_sound.queue_free)
 
 func _cambiar_color_recursivo(nodo, color):
 	if nodo is CanvasItem:

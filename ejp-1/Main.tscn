@@ -3,9 +3,13 @@
 [ext_resource type="Texture2D" uid="uid://brrf4lrd1exxs" path="res://images/main/plataforma.png" id="1_fos0i"]
 [ext_resource type="Script" uid="uid://40okfybym745" path="res://spawner.gd" id="1_glv2v"]
 [ext_resource type="PackedScene" uid="uid://cagnmugkb6ts3" path="res://Slime.tscn" id="2_uu6xs"]
-[ext_resource type="Script" uid="uid://djsur8rs8o1e5" path="res://Global.gd" id="3_r0du0"]
+[ext_resource type="Texture2D" uid="uid://c26s71jlphwgo" path="res://images/main/plataforma2.png" id="2_wkp8b"]
+[ext_resource type="Texture2D" uid="uid://cr52npe0os1ee" path="res://images/main/plataforma3.png" id="3_20pc6"]
+[ext_resource type="Texture2D" uid="uid://dfrgwgj4fttft" path="res://images/main/plataforma4.png" id="4_5vvyt"]
 [ext_resource type="Texture2D" uid="uid://dovmluinqgo1w" path="res://images/main/font.png" id="4_cm0pq"]
 [ext_resource type="Texture2D" uid="uid://ce0oc0b00x3gr" path="res://images/main/earth.jpg" id="5_3dxm6"]
+[ext_resource type="Texture2D" uid="uid://cm11txo0rhfol" path="res://images/main/plataforma5.png" id="5_c6i3y"]
+[ext_resource type="Texture2D" uid="uid://fdhr1kei6pcu" path="res://images/main/fondo.jpg" id="6_3dxm6"]
 
 [sub_resource type="QuadMesh" id="QuadMesh_uu6xs"]
 
@@ -86,50 +90,403 @@ animations = [{
 
 [node name="Node2D" type="Node2D" unique_id=422834103]
 
-[node name="StaticBody2D" type="StaticBody2D" parent="." unique_id=444815365]
+[node name="plataforma1" type="StaticBody2D" parent="." unique_id=444815365]
+visible = false
+position = Vector2(93, -425)
+scale = Vector2(0.3999989, 1)
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D" unique_id=1907286990]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="plataforma1" unique_id=1907286990]
 position = Vector2(1.9999886, 62)
 rotation = 3.1415927
 scale = Vector2(562, 26)
 mesh = SubResource("QuadMesh_uu6xs")
 texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D" unique_id=666114278]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="plataforma1" unique_id=666114278]
 position = Vector2(1.5, 62)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D2" type="StaticBody2D" parent="." unique_id=1941947941]
-collision_layer = 2
-collision_mask = 0
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D2" unique_id=1954936739]
-position = Vector2(-425.00003, -5)
-rotation = -3.1415927
-scale = Vector2(139.60385, 25.16)
+[node name="part2" type="MeshInstance2D" parent="plataforma1" unique_id=1307519167]
+position = Vector2(-626.5025, 180.00003)
+rotation = -3.1415925
+scale = Vector2(562, 26)
 mesh = SubResource("QuadMesh_uu6xs")
 texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D2" unique_id=2122226257]
-position = Vector2(-425, -4)
-shape = SubResource("RectangleShape2D_cm0pq")
+[node name="paart2" type="CollisionShape2D" parent="plataforma1" unique_id=324898210]
+position = Vector2(-627.0025, 180.00003)
+shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D3" type="StaticBody2D" parent="." unique_id=891658260]
+[node name="part3" type="MeshInstance2D" parent="plataforma1" unique_id=777125048]
+position = Vector2(-739.0028, 513.00006)
+rotation = -3.1415925
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
+
+[node name="paart3" type="CollisionShape2D" parent="plataforma1" unique_id=2065129523]
+position = Vector2(-739.5028, 513.00006)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="part6" type="MeshInstance2D" parent="plataforma1" unique_id=2141628294]
+position = Vector2(228.49982, 513.00006)
+rotation = -3.1415925
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
+
+[node name="paart6" type="CollisionShape2D" parent="plataforma1" unique_id=51829474]
+position = Vector2(227.99982, 513.00006)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="part4" type="MeshInstance2D" parent="plataforma1" unique_id=69213409]
+position = Vector2(198.49976, 180.00003)
+rotation = -3.1415925
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
+
+[node name="paart4" type="CollisionShape2D" parent="plataforma1" unique_id=1053200026]
+position = Vector2(197.99976, 180.00003)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="part5" type="MeshInstance2D" parent="plataforma1" unique_id=19535487]
+position = Vector2(-234.0014, 333.00003)
+rotation = -3.1415925
+scale = Vector2(516.4999, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("1_fos0i")
+
+[node name="paart5" type="CollisionShape2D" parent="plataforma1" unique_id=1333179770]
+position = Vector2(-234.5014, 333.00003)
+scale = Vector2(0.9190389, 1)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="plataforma2" type="StaticBody2D" parent="." unique_id=1941947941]
+visible = false
+position = Vector2(530, -153)
+scale = Vector2(1.4399999, 1)
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D3" unique_id=1761981834]
+[node name="part1" type="MeshInstance2D" parent="plataforma2" unique_id=1954936739]
+position = Vector2(-390.61478, 40.58)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde1" type="CollisionShape2D" parent="plataforma2" unique_id=2122226257]
+position = Vector2(-390.61475, 41.58)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="part2" type="MeshInstance2D" parent="plataforma2" unique_id=1581449512]
+position = Vector2(-248.25363, -71.42)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde2" type="CollisionShape2D" parent="plataforma2" unique_id=1247817105]
+position = Vector2(-248.2536, -70.42)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="part3" type="MeshInstance2D" parent="plataforma2" unique_id=1527509253]
+position = Vector2(-499.64255, 171.58)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde3" type="CollisionShape2D" parent="plataforma2" unique_id=190222661]
+position = Vector2(-499.64252, 172.58)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="part5" type="MeshInstance2D" parent="plataforma2" unique_id=364323692]
+position = Vector2(-581.587, 424.58002)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde5" type="CollisionShape2D" parent="plataforma2" unique_id=748094643]
+position = Vector2(-581.587, 425.58002)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="part6" type="MeshInstance2D" parent="plataforma2" unique_id=916386108]
+position = Vector2(-157.28143, 422.58002)
+rotation = -3.1415927
+scale = Vector2(139.60385, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde6" type="CollisionShape2D" parent="plataforma2" unique_id=1408014511]
+position = Vector2(-157.2814, 423.58002)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="part4" type="MeshInstance2D" parent="plataforma2" unique_id=628323954]
+position = Vector2(-371.36478, 323.58002)
+rotation = -3.1415927
+scale = Vector2(230.88162, 25.16)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("2_wkp8b")
+
+[node name="molde4" type="CollisionShape2D" parent="plataforma2" unique_id=721851604]
+position = Vector2(-371.36475, 324.58002)
+scale = Vector2(1.6538343, 1)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="plataforma3" type="StaticBody2D" parent="." unique_id=891658260]
+position = Vector2(-184, -67)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Mesh1" type="MeshInstance2D" parent="plataforma3" unique_id=1761981834]
+position = Vector2(169.125, 138)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision1" type="CollisionShape2D" parent="plataforma3" unique_id=144786541]
+position = Vector2(168.125, 139)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh6" type="MeshInstance2D" parent="plataforma3" unique_id=1914512760]
+position = Vector2(-24.875, 256)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision6" type="CollisionShape2D" parent="plataforma3" unique_id=498691769]
+position = Vector2(-25.875, 257)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh7" type="MeshInstance2D" parent="plataforma3" unique_id=161168845]
+position = Vector2(312.125, 243)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision7" type="CollisionShape2D" parent="plataforma3" unique_id=1042592746]
+position = Vector2(311.125, 244)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh8" type="MeshInstance2D" parent="plataforma3" unique_id=330884969]
+position = Vector2(148.125, -125)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision8" type="CollisionShape2D" parent="plataforma3" unique_id=101589596]
+position = Vector2(147.125, -124)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh2" type="MeshInstance2D" parent="plataforma3" unique_id=636297349]
+position = Vector2(-18.875, 3.0000076)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision2" type="CollisionShape2D" parent="plataforma3" unique_id=37935512]
+position = Vector2(-19.875, 4.0000076)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh3" type="MeshInstance2D" parent="plataforma3" unique_id=2101768431]
+position = Vector2(284.125, -147)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision3" type="CollisionShape2D" parent="plataforma3" unique_id=1035703566]
+position = Vector2(283.125, -146)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh4" type="MeshInstance2D" parent="plataforma3" unique_id=669932563]
 position = Vector2(386, 2)
 rotation = 3.1415927
 scale = Vector2(136.25002, 26)
 mesh = SubResource("QuadMesh_uu6xs")
-texture = ExtResource("1_fos0i")
+texture = ExtResource("3_20pc6")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D3" unique_id=144786541]
+[node name="Collision4" type="CollisionShape2D" parent="plataforma3" unique_id=539147336]
 position = Vector2(385, 3)
 shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="Mesh5" type="MeshInstance2D" parent="plataforma3" unique_id=1208924235]
+position = Vector2(386, 2)
+rotation = 3.1415927
+scale = Vector2(136.25002, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("3_20pc6")
+
+[node name="Collision5" type="CollisionShape2D" parent="plataforma3" unique_id=753150679]
+position = Vector2(385, 3)
+shape = SubResource("RectangleShape2D_cm0pq")
+
+[node name="plataforma4" type="StaticBody2D" parent="." unique_id=1902253042]
+visible = false
+position = Vector2(74, -196)
+scale = Vector2(0.38395306, 1.0488552)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Mesh1" type="MeshInstance2D" parent="plataforma4" unique_id=1148434049]
+position = Vector2(260.1641, -61.366783)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision1" type="CollisionShape2D" parent="plataforma4" unique_id=135350827]
+position = Vector2(257.1641, -61.366783)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh2" type="MeshInstance2D" parent="plataforma4" unique_id=1306504410]
+position = Vector2(-651.40564, 90.22707)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision2" type="CollisionShape2D" parent="plataforma4" unique_id=1399195617]
+position = Vector2(-654.40564, 90.22707)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh3" type="MeshInstance2D" parent="plataforma4" unique_id=1678109995]
+position = Vector2(239.32819, 194.14992)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision3" type="CollisionShape2D" parent="plataforma4" unique_id=64781555]
+position = Vector2(236.32825, 194.14992)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh4" type="MeshInstance2D" parent="plataforma4" unique_id=2994485]
+position = Vector2(-635.7787, 322.8617)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision4" type="CollisionShape2D" parent="plataforma4" unique_id=1542711441]
+position = Vector2(-638.77875, 322.8617)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh5" type="MeshInstance2D" parent="plataforma4" unique_id=475748675]
+position = Vector2(254.95514, 406.7627)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision5" type="CollisionShape2D" parent="plataforma4" unique_id=2058710225]
+position = Vector2(251.95514, 406.7627)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh6" type="MeshInstance2D" parent="plataforma4" unique_id=1157919126]
+position = Vector2(-656.61456, -59.4599)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("4_5vvyt")
+
+[node name="Collision6" type="CollisionShape2D" parent="plataforma4" unique_id=1035965625]
+position = Vector2(-659.6146, -59.4599)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="plataforma5" type="StaticBody2D" parent="." unique_id=469472534]
+visible = false
+position = Vector2(74, -196)
+scale = Vector2(0.38395306, 1.0488552)
+collision_layer = 2
+collision_mask = 0
+
+[node name="Mesh1" type="MeshInstance2D" parent="plataforma5" unique_id=1834468689]
+position = Vector2(260.1641, -61.366783)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision1" type="CollisionShape2D" parent="plataforma5" unique_id=680165556]
+position = Vector2(257.1641, -61.366783)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh2" type="MeshInstance2D" parent="plataforma5" unique_id=1269024295]
+position = Vector2(-216.45663, -61.366783)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision2" type="CollisionShape2D" parent="plataforma5" unique_id=2067611234]
+position = Vector2(-219.45667, -61.366783)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh3" type="MeshInstance2D" parent="plataforma5" unique_id=131530207]
+position = Vector2(244.53722, -198.65933)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision3" type="CollisionShape2D" parent="plataforma5" unique_id=2079867004]
+position = Vector2(241.53725, -198.65933)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh4" type="MeshInstance2D" parent="plataforma5" unique_id=1276385536]
+position = Vector2(-651.4055, 92.13391)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision4" type="CollisionShape2D" parent="plataforma5" unique_id=1703855475]
+position = Vector2(-654.40564, 92.13391)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh5" type="MeshInstance2D" parent="plataforma5" unique_id=311842786]
+position = Vector2(-52.374146, 214.17175)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision5" type="CollisionShape2D" parent="plataforma5" unique_id=1032816821]
+position = Vector2(-55.374268, 214.17175)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh6" type="MeshInstance2D" parent="plataforma5" unique_id=1028513420]
+position = Vector2(273.18652, 357.1848)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision6" type="CollisionShape2D" parent="plataforma5" unique_id=1875324070]
+position = Vector2(270.18643, 357.1848)
+shape = SubResource("RectangleShape2D_r0du0")
+
+[node name="Mesh7" type="MeshInstance2D" parent="plataforma5" unique_id=2129490917]
+position = Vector2(-664.428, 357.1848)
+rotation = 3.1415927
+scale = Vector2(562, 26)
+mesh = SubResource("QuadMesh_uu6xs")
+texture = ExtResource("5_c6i3y")
+
+[node name="Collision7" type="CollisionShape2D" parent="plataforma5" unique_id=128204021]
+position = Vector2(-667.4282, 357.1848)
+shape = SubResource("RectangleShape2D_r0du0")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=346593700]
 
@@ -138,56 +495,44 @@ script = ExtResource("1_glv2v")
 slime_scene = ExtResource("2_uu6xs")
 
 [node name="GameManager" type="Node" parent="." unique_id=2089170012]
-script = ExtResource("3_r0du0")
 
-[node name="StaticBody2D4" type="StaticBody2D" parent="." unique_id=1824078104]
+[node name="pared1" type="StaticBody2D" parent="." unique_id=1824078104]
+position = Vector2(284, -129)
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D4" unique_id=918168867]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="pared1" unique_id=918168867]
 position = Vector2(-575, 53)
-scale = Vector2(39.39009, 528.75)
+scale = Vector2(39.39, 928.75)
 mesh = SubResource("QuadMesh_r0du0")
 texture = ExtResource("5_3dxm6")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D4" unique_id=364989859]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="pared1" unique_id=364989859]
 position = Vector2(-566, 57)
+scale = Vector2(1, 1.9199996)
 shape = SubResource("RectangleShape2D_fos0i")
 
-[node name="StaticBody2D5" type="StaticBody2D" parent="." unique_id=1540511664]
+[node name="pared2" type="StaticBody2D" parent="." unique_id=1540511664]
+position = Vector2(-283, -266)
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D5" unique_id=1141914763]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="pared2" unique_id=1141914763]
 position = Vector2(574.00006, 52)
-scale = Vector2(43.43009, 546.755)
+scale = Vector2(43.43, 946.755)
 mesh = SubResource("QuadMesh_r0du0")
 texture = ExtResource("5_3dxm6")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D5" unique_id=2050341488]
-position = Vector2(563, 60.5)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="pared2" unique_id=2050341488]
+position = Vector2(563, 202)
+scale = Vector2(1, 1.7599995)
 shape = SubResource("RectangleShape2D_fos0i")
 
-[node name="StaticBody2D6" type="StaticBody2D" parent="." unique_id=1902253042]
+[node name="base1" type="StaticBody2D" parent="." unique_id=840721506]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D6" unique_id=1148434049]
-position = Vector2(-5, -88)
-rotation = 3.1415927
-scale = Vector2(562, 26)
-mesh = SubResource("QuadMesh_uu6xs")
-texture = ExtResource("1_fos0i")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D6" unique_id=135350827]
-position = Vector2(-8, -88)
-shape = SubResource("RectangleShape2D_r0du0")
-
-[node name="StaticBody2D7" type="StaticBody2D" parent="." unique_id=840721506]
-collision_layer = 2
-collision_mask = 0
-
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D7" unique_id=386271177]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="base1" unique_id=386271177]
 texture_repeat = 1
 position = Vector2(-291.00003, 309)
 rotation = 3.1415927
@@ -195,15 +540,15 @@ scale = Vector2(700, 26)
 mesh = SubResource("QuadMesh_uu6xs")
 texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D7" unique_id=1390908207]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="base1" unique_id=1390908207]
 position = Vector2(-295.125, 309)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="StaticBody2D8" type="StaticBody2D" parent="." unique_id=1048821346]
+[node name="base2" type="StaticBody2D" parent="." unique_id=1048821346]
 collision_layer = 2
 collision_mask = 0
 
-[node name="MeshInstance2D" type="MeshInstance2D" parent="StaticBody2D8" unique_id=2049799778]
+[node name="MeshInstance2D" type="MeshInstance2D" parent="base2" unique_id=2049799778]
 texture_filter = 1
 texture_repeat = 2
 position = Vector2(269.75, 309)
@@ -212,14 +557,47 @@ scale = Vector2(700, 26)
 mesh = SubResource("QuadMesh_uu6xs")
 texture = ExtResource("1_fos0i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StaticBody2D8" unique_id=1326735053]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="base2" unique_id=1326735053]
 position = Vector2(269.0625, 308)
 shape = SubResource("RectangleShape2D_r0du0")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=128718372]
+[node name="AnimatedSprite2D1" type="AnimatedSprite2D" parent="." unique_id=128718372]
+visible = false
 z_index = -10
-position = Vector2(-20, 19)
-scale = Vector2(2.3, 2.3)
+position = Vector2(-20, -74.49998)
+scale = Vector2(2.3, 3.0845592)
 sprite_frames = SubResource("SpriteFrames_c6i3y")
 autoplay = "default"
-frame_progress = 0.50548846
+
+[node name="AnimatedSprite2D2" type="AnimatedSprite2D" parent="." unique_id=150360236]
+z_index = -10
+position = Vector2(-20, -74.49998)
+scale = Vector2(2.3, 3.0845592)
+sprite_frames = SubResource("SpriteFrames_c6i3y")
+autoplay = "default"
+
+[node name="AnimatedSprite2D3" type="AnimatedSprite2D" parent="." unique_id=1883577929]
+z_index = -10
+position = Vector2(-20, -74.49998)
+scale = Vector2(2.3, 3.0845592)
+sprite_frames = SubResource("SpriteFrames_c6i3y")
+autoplay = "default"
+
+[node name="AnimatedSprite2D4" type="AnimatedSprite2D" parent="." unique_id=502377430]
+z_index = -10
+position = Vector2(-20, -74.49998)
+scale = Vector2(2.3, 3.0845592)
+sprite_frames = SubResource("SpriteFrames_c6i3y")
+autoplay = "default"
+
+[node name="AnimatedSprite2D5" type="AnimatedSprite2D" parent="." unique_id=1834159158]
+z_index = -10
+position = Vector2(-20, -74.49998)
+scale = Vector2(2.3, 3.0845592)
+sprite_frames = SubResource("SpriteFrames_c6i3y")
+autoplay = "default"
+
+[node name="Fondo" type="Sprite2D" parent="." unique_id=627562537]
+position = Vector2(0.4999771, 477.125)
+scale = Vector2(0.8642171, 0.58368856)
+texture = ExtResource("6_3dxm6")

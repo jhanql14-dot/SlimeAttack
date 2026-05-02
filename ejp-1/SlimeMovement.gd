@@ -22,6 +22,12 @@ var gravedad := 1600.0
 @export var champion_focus_base_probability := 0.25
 @export var champion_focus_multi_win_probability := 0.4
 
+# 🔊 Ajustes de sonido
+@export var jump_sound_volume := -12.0 # Volumen del salto (-70% aprox)
+@export var jump_sound_delay := 0.0   # Retraso del sonido tras el salto
+@export var attack_sound_volume := -6.0 # Volumen del ataque
+@export var attack_sound_delay := 0.0   # Retraso del sonido del ataque
+
 var direccion := 1
 var target = null
 var dead := false
@@ -49,15 +55,26 @@ var phase3_result := ""
 var nombre = ""
 var historial_saltos = []  # Rastrear corto(0) o largo(1)
 var consecutive_victories := 0
+var total_wins := 0
 var is_champion := false
+var current_round_kills := 0
+var last_kill_msec := 0
 
 @onready var sprite: Sprite2D = $Sprite2D
 @onready var anim: AnimationPlayer = $AnimationPlayer
+var lbl_nombre : Label
 
 
 func _ready():
 	add_to_group("slimes")
+	# Randomizar estadísticas base (más moderado)
+	speed = int(speed * randf_range(0.9, 1.2))
+	fuerza_salto = int(fuerza_salto * randf_range(0.95, 1.05))
+	tiempo_espera = tiempo_espera * randf_range(0.8, 1.2)
 	health = max_health
+	current_round_kills = 0
+	last_kill_msec = 0
+	set_meta("temporal_kills", 0)
 
 	# Crear label con nombre si existe
 	if nombre != "":
@@ -76,8 +93,22 @@ func _ready():
 			label.position = Vector2(-25, -60)  # Fallback
 		
 		add_child(label)
+		lbl_nombre = label
+		_actualizar_nombre_ui()
 	
 	loop_saltos()
+
+func _actualizar_nombre_ui():
+	if is_instance_valid(lbl_nombre):
+		var prefix = "👑 " if total_wins > 0 else ""
+		lbl_nombre.text = prefix + nombre
+		
+		# Reposicionar para que siempre esté arriba aunque el slime crezca
+		var collision = get_node_or_null("CollisionShape2D")
+		if collision and collision.shape is RectangleShape2D:
+			var extents = collision.shape.extents
+			lbl_nombre.position = collision.position + Vector2(-50, -extents.y - 30)
+			lbl_nombre.size = Vector2(100, 30)
 
 
 func _physics_process(delta):
@@ -98,14 +129,24 @@ func _physics_process(delta):
 		die()
 		return
 
-	# 🟡 FASE 3 (sin control manual)
+	# 🟡 FASE 3 (sin control manual, salvo ganador)
 	if Global.game_phase == 3:
-		velocity.x = 0
+		if phase3_result == "win":
+			# El ganador se mueve al centro
+			var center_x = 0 # En Main.tscn la cámara suele estar en 0 o centrada
+			var dx = center_x - global_position.x
+			if abs(dx) > 30:
+				velocity.x = sign(dx) * speed
+			else:
+				velocity.x = 0
+		else:
+			velocity.x = 0
 
 		if is_on_floor() and not fase3_animacion_hecha:
 			fase3_animacion_hecha = true
 			if phase3_result == "win":
 				anim.play("Slime_Wiggle")
+				lanzar_confeti()
 			else:
 				anim.play("Slime_Die")
 
@@ -210,6 +251,9 @@ func attack(enemy):
 
 	enemy.attack_target = self
 
+	# 🔊 Sonido de ataque
+	_reproducir_sonido_ataque_con_retraso()
+
 	anim.play("Slime_Slash")
 
 	await get_tree().create_timer(0.4).timeout
@@ -222,6 +266,7 @@ func attack(enemy):
 		var damage = randi_range(attack_damage_min, attack_damage_max)
 		enemy.take_damage(damage)
 		if enemy.dead:
+			_on_enemy_killed()
 			apply_victory_boost()
 
 	await get_tree().create_timer(1.0).timeout
@@ -282,22 +327,34 @@ func die():
 
 	anim.play("Slime_Die")
 
+	# 🔊 Sonido de muerte
+	var death_sound = AudioStreamPlayer.new()
+	death_sound.stream = preload("res://sounds/14_PlayerHitAndLosePowerUp.mp3")
+	get_parent().add_child(death_sound) # Añadir al padre para que no muera con el slime
+	death_sound.play()
+	death_sound.finished.connect(death_sound.queue_free)
+
 	await get_tree().create_timer(1.0).timeout
 	queue_free()
 
 func apply_victory_boost():
+	# Si ya creció mucho, no lo hacemos crecer más (evita acumulación infinita)
+	if sprite.scale.x > 2.5: 
+		return
+
 	# Ajustes fáciles de configurar mediante variables exportadas
 	sprite.scale *= victory_boost_scale
 	attack_range *= victory_boost_collision
 	attack_damage_min = int(ceil(attack_damage_min * victory_boost_damage))
 	attack_damage_max = int(ceil(attack_damage_max * victory_boost_damage))
 
-	var collision = get_node("CollisionShape2D")
+	var collision = get_node_or_null("CollisionShape2D")
 	if collision and collision.shape is RectangleShape2D:
 		# Asegurar que cada instancia tenga su propio recurso de forma
 		collision.shape = collision.shape.duplicate(true)
 		collision.shape.extents *= victory_boost_collision
-
+	
+	_actualizar_nombre_ui() # Actualizar posición del nombre tras crecer
 	print("🏆 ", nombre, " ha derrotado a un enemigo y su sprite crece ", int((victory_boost_scale - 1.0) * 100), "%")
 
 
@@ -307,44 +364,72 @@ func loop_saltos():
 		await get_tree().create_timer(tiempo_espera).timeout
 
 		if is_on_floor() and not is_attacking and not is_hurt:
-			saltar()
+			# Permitir saltar en fase 3 solo si es ganador
+			if Global.game_phase == 3:
+				if phase3_result == "win":
+					saltar()
+			else:
+				saltar()
 
 
 func saltar():
+	# 🔊 Reproducir sonido con el retraso configurado
+	_reproducir_sonido_salto_con_retraso()
+
 	if Global.game_phase == 2 and target:
-		direccion = sign(target.global_position.x - global_position.x)
+		var dx = target.global_position.x - global_position.x
+		direccion = sign(dx)
+		
+		# Si el objetivo está muy lejos horizontalmente, aumentar probabilidad de salto largo
+		if abs(dx) > 200:
+			historial_saltos.append(1) # Forzar o sugerir largo
+		
+		# Si estamos muy cerca horizontalmente pero en diferente altura, intentar saltar al azar
+		if abs(dx) < 30 and abs(target.global_position.y - global_position.y) > 50:
+			direccion = [-1, 1].pick_random()
 	else:
 		direccion = [-1, 1].pick_random()
 
-	# Variar la altura del salto (k entre 1 y 2)
-	var k = randf_range(1.0, 2.0)
-	gravedad = 1600.0 * k
-	var fuerza_salto_actual = -480.0 * k
+	# Variar la altura del salto (k entre 1.0 y 1.4 para que no sea tan alto)
+	var k = randf_range(1.0, 1.4)
+	var fuerza_salto_actual = fuerza_salto * k
 	velocity.y = fuerza_salto_actual
 	
-	# Determinar si es salto corto o largo con alternancia
-	var jump_speed
-	if historial_saltos.size() >= 3:
-		var ultimos_tres = historial_saltos.slice(-3)
-		if ultimos_tres[0] == ultimos_tres[1] and ultimos_tres[1] == ultimos_tres[2]:
-			# Si los últimos 3 son iguales, forzar lo contrario
-			var tipo_forzado = 1 - ultimos_tres[0]
-			jump_speed = speed * (2.0 if tipo_forzado == 1 else 1.0)
-			historial_saltos.append(tipo_forzado)
-		else:
-			# Aleatorio normal
-			var tipo_aleatorio = randi() % 2
-			jump_speed = speed * (2.0 if tipo_aleatorio == 1 else 1.0)
-			historial_saltos.append(tipo_aleatorio)
-	else:
-		# Comenzar con aleatorio
-		var tipo_aleatorio = randi() % 2
-		jump_speed = speed * (2.0 if tipo_aleatorio == 1 else 1.0)
-		historial_saltos.append(tipo_aleatorio)
+	# Velocidad horizontal aleatoria basada en la base
+	var random_speed_mult = randf_range(0.7, 1.8)
+	
+	# AGRESIVIDAD: Si el objetivo está abajo, saltar más fuerte horizontalmente para caer de la plataforma
+	if target and target.global_position.y > global_position.y + 100:
+		random_speed_mult *= 2.0
+		
+	var jump_speed = speed * random_speed_mult
 	
 	velocity.x = direccion * jump_speed
-
 	sprite.flip_h = direccion > 0
+
+
+func _reproducir_sonido_salto_con_retraso():
+	if jump_sound_delay > 0:
+		await get_tree().create_timer(jump_sound_delay).timeout
+	
+	var jump_sound = AudioStreamPlayer.new()
+	jump_sound.stream = preload("res://sounds/5_TakePill.mp3")
+	jump_sound.volume_db = jump_sound_volume
+	add_child(jump_sound)
+	jump_sound.play()
+	jump_sound.finished.connect(jump_sound.queue_free)
+
+
+func _reproducir_sonido_ataque_con_retraso():
+	if attack_sound_delay > 0:
+		await get_tree().create_timer(attack_sound_delay).timeout
+	
+	var atk_sound = AudioStreamPlayer.new()
+	atk_sound.stream = preload("res://sounds/89_DropTail.mp3")
+	atk_sound.volume_db = attack_sound_volume
+	add_child(atk_sound)
+	atk_sound.play()
+	atk_sound.finished.connect(atk_sound.queue_free)
 
 
 # 🎞 animaciones
@@ -361,6 +446,87 @@ func actualizar_animacion():
 	if not is_on_floor():
 		anim.play("Slime_Jump")
 	elif target:
-		anim.play("Slime_Run")
+		if anim.has_animation("Slime_Run"):
+			anim.play("Slime_Run")
+		elif anim.has_animation("Slime_Wiggle"):
+			anim.play("Slime_Wiggle")
+		else:
+			anim.play("Slime_Idle")
+
+func lanzar_confeti():
+	var particles = CPUParticles2D.new()
+	particles.amount = 50
+	particles.explosiveness = 0.8
+	particles.spread = 180.0
+	particles.gravity = Vector2(0, 500)
+	particles.initial_velocity_min = 200.0
+	particles.initial_velocity_max = 400.0
+	particles.scale_amount_min = 5.0
+	particles.scale_amount_max = 10.0
+	particles.color_ramp = Gradient.new()
+	particles.color_ramp.add_point(0.0, Color(1, 0, 0))
+	particles.color_ramp.add_point(0.2, Color(0, 1, 0))
+	particles.color_ramp.add_point(0.4, Color(0, 0, 1))
+	particles.color_ramp.add_point(0.6, Color(1, 1, 0))
+	particles.color_ramp.add_point(0.8, Color(1, 0, 1))
+	particles.color_ramp.add_point(1.0, Color(0, 1, 1))
+	
+	# Hacer que los colores sean variados desde el inicio
+	particles.hue_variation_min = -1.0
+	particles.hue_variation_max = 1.0
+	
+	add_child(particles)
+	particles.emitting = true
+	particles.one_shot = true
+	
+	# 🔊 Sonido de victoria (opcional si ya existe uno, pero el usuario pidió mejor animación)
+	var win_sound = AudioStreamPlayer.new()
+	win_sound.stream = preload("res://sounds/72_Finish.mp3") # Sonido de éxito
+	add_child(win_sound)
+	win_sound.play()
+	
+	await get_tree().create_timer(3.0).timeout
+	particles.queue_free()
+	win_sound.queue_free()
+
+func _on_enemy_killed():
+	var now = Time.get_ticks_msec()
+	var time_since_last = (now - last_kill_msec) / 1000.0
+	
+	current_round_kills += 1
+	
+	# FIRST BLOOD
+	if not Global.first_blood_happened:
+		Global.first_blood_happened = true
+		Global.announce_kill("first_blood", nombre, sprite.modulate)
+	
+	# MULTI-KILLS (Tolerancia 10s)
+	if last_kill_msec > 0 and time_since_last <= 10.0:
+		# Continuar racha
+		pass
 	else:
-		anim.play("Slime_Idle")
+		# Reset racha de tiempo pero no de muertes si es muy lento?
+		# Usualmente multi-kill es X muertes seguidas con poco tiempo entre ellas.
+		# Si pasa más de 10s, la racha de "Double/Triple" se resetea.
+		# Pero el usuario pidió "Double kill" si mata a dos en menos de 10s.
+		# Así que usaremos un contador de racha temporal.
+		# Re-usaremos current_round_kills para simplificar o uno específico.
+		pass
+	
+	# Lógica de racha temporal
+	if last_kill_msec == 0 or time_since_last > 10.0:
+		# Reiniciar racha temporal a 1 (esta muerte)
+		# Pero no queremos perder First Blood
+		# Vamos a usar una variable local para la racha de tiempo
+		set_meta("temporal_kills", 1)
+	else:
+		var tk = get_meta("temporal_kills", 1) + 1
+		set_meta("temporal_kills", tk)
+		
+		match tk:
+			2: Global.announce_kill("double", nombre, sprite.modulate)
+			3: Global.announce_kill("triple", nombre, sprite.modulate)
+			4: Global.announce_kill("ultra", nombre, sprite.modulate)
+			5, _: Global.announce_kill("rampage", nombre, sprite.modulate)
+
+	last_kill_msec = now
